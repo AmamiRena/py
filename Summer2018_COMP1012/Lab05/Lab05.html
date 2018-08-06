@@ -1,0 +1,119 @@
+<html>
+  <head>
+    <meta content="text/html; charset=windows-1252" http-equiv="content-type">
+    <title>Lab 5</title>
+    <link rel="stylesheet" type="text/css" href="COMP1012Lab.css">
+  </head>
+  <body>
+    <div class="default">
+
+      <h1 style="font-size:20pt">COMP 1012 Lab 5</h1>
+      <p><strong>June 11 to June 15, 2018</strong> </p>
+      <h2>Material covered:</h2>
+      <ul>
+        <li>Tuples</li>
+          <li>Lists</li>
+          <li>Sets</li>
+          <li>Dictionaries</li>
+      </ul>
+      
+      <h2>Notes:</h2>
+      <p> 
+        All Python exercises are to be done using <span class="codeword">Anaconda
+        Python</span> Integrated Development Environment.
+      </p>
+      <p>
+        At some point during the lab, the demonstrator will circulate an
+        attendance sheet. Sign it and pass it on.
+      </p>
+      <p>
+        It is difficult to create a lab that will keep every student occupied
+        for exactly 50 minutes. If you are finished early, use the time to
+        explore other options in your programs, or to help others around you.
+        Most learning takes place when you try to do something and you don't
+        know how at first. If you do not finish in the time available, look at
+        the rest of the lab at some other time before next week's lab. Remember,
+        the learning is cumulative, so if you don't learn something, next week's
+        lab will seem harder.
+      </p>
+
+      <h2>Exercise 1: Tuples.</h2>
+      <ol>
+          <li>
+              Create two tuples representing points in a plane—
+              <span class="codeword">A:(3.5,1.2)</span>
+              and <span class="codeword">B:(-2.7,-3.2)</span>. Print them. What format
+              code should you use to print a tuple? A simple way to print a tuple is
+              to convert it to a string representation using the
+              <span class="codeword">str</span> function, then print it using a
+              string placeholder.
+          </li>
+          <li>
+              Create another tuple representing a vector from <span class="codeword">A</span>
+              to <span class="codeword">B</span> (that is, <span class="codeword">B-A</span>).
+              Notice you can't just subtract one from the other; tuples don't
+              support subtraction. Perform the subtraction one coordinate at a time
+              by subscripting in the original tuples. Print the vector.
+          </li>
+          <li>
+              Create another tuple representing a point
+              <span class="codeword">C:(4.2, 2.8)</span>, and a tuple for the vector
+              <span class="codeword">C-B</span>.
+              Print the points and vector.
+          </li>
+          <li>
+              Calculate and print the sum of the two difference vectors
+              <span class="codeword">(C-B) + (B-A)</span> by adding their
+              corresponding elements. Calculate and print the vector difference
+              <span class="codeword">C-A</span>. Are these two the same?
+              Test their equality using the <span class="codeword">==</span>
+              operator.
+          </li>
+         
+      </ol>
+        
+        
+      <h2>Exercise 2: List </h2>
+	  <ol>
+		<li>Write a program that will take 10 inputs from the user and append the inputs to a list. After completing taking inputs print each value in the list. For taking inputs you need to use for loop. The inputs can be a number or a string. Remember to use a loop for printing the value because if you directly print the list, it will print bracket at the beginning and at the end.</li>
+		<li> Create a list with 5 integers and find the sum of all elements in the list. To find the sum, you don't need to use any loop. You can use the sum function. for example, if _x is your list, then sum(_x) will give you the sum of the list.
+		<li>Create another list with 5 integers. Subtract the corresponding element from the list you created in (2). Add the subtraction result to another list and print the results.</li>
+		<li>Convert the range(1,11) to a list.</li>
+		<li> Find first n odd numbers to a list where n is the input from the user. Add the numbers to a list and then print the numbers.</li>
+		<li>Write a program that will ask the user to give inputs of 5 coordinates. Each coordinate contains two values (x-axis, y-axis). Use a for loop to take 5 inputs from the user. Inside for loop take two inputs: one for x coordinate and another for y coordinate and then create a tuple with those inputs. After creating the tuple, add the tuple to a list and print the tuples.</li>
+	  </ol>
+	  <h2>Exercise 3: Sets </h2>
+	  <ol>
+		<li>Create two sets with 1, 5, 3, 7, 3, 5, 9, 2 and 2, 4, 7, 0, 6, 9</li>
+		<li>Print the sets. Are there any duplicate elements in the set?</li>
+		<li>Find the union and intersection of the sets and print the results. You need to use a loop to print the results to avoid {} to show up in the print. But in the set, you cannot directly use an index to invoke an element in the set. First, you need to convert the set to a list and then you can print it.</li>
+		<li>Find the set difference and again print the result.</li>
+	  </ol>
+      
+	  <h2>Exercise 4: Sets </h2>
+	  <p class="todo">
+        Create a dictionary that contains entries for the sports teams for Canadian
+        cities. The key values are the names of the cities, and the data item for 
+        each city is a list of the sports teams in that city. To get you started, you
+        can copy and paste this string into your script:
+      </p>
+      <p  class="codeword">
+        {'Winnipeg': ['Jets', 'Blue Bombers', 'Goldeyes' ,'Moose'],
+         'Vancouver': ['Canucks', 'Lions', 'Whitecaps'],
+         'Hamilton': ['Tiger Cats', 'Cardinals']}
+      </p>
+      <p>
+        Add at least one more city to your dictionary. Run your script. 
+        Now try accessing the dictionary
+        in the IPython console to find the names of the teams in a particular city,
+        for example if your dictionary is called
+        <span class="codeword">teams</span>, then typing 
+        <span class="codeword">teams['Winnipeg']</span> will list the value for that
+        entry.
+      </p>
+	  
+	</div>
+          
+  </body>
+</html>
+
