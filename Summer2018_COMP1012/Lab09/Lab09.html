@@ -1,0 +1,208 @@
+<html>
+  <head>
+    <meta content="text/html; charset=windows-1252" http-equiv="content-type">
+    <title>Lab 9: 2D Numpy Arrays</title>
+    <link rel="stylesheet" type="text/css" href="COMP1012Lab.css">
+  </head>
+  <body>
+    <div class="default">
+    <h1 style="font-size:20pt">COMP 1012 Lab 9</h1>
+    <p><strong>July 23 to 27, 2018</strong> </p>
+    <h2>Material covered:</h2>
+    <ul>
+      <li>2D <span class="codeword">numpy</span> arrays.</li>
+    </ul>
+    <h2>Notes:</h2>
+    <p> 
+      All Python exercises are to be done using <span class="codeword">Anaconda
+      Python</span> Integrated Development Environment.
+    </p>
+    <p>
+      At some point during the lab, the demonstrator will circulate an
+      attendance sheet. Sign it and pass it on.
+    </p>
+    <p>
+      It is difficult to create a lab that will keep every student occupied
+      for exactly 50 minutes. If you are finished early, use the time to
+      explore other options in your programs, or to help others around you.
+      Most learning takes place when you try to do something and you don't
+      know how at first. If you do not finish in the time available, look at
+      the rest of the lab at some other time before next week's lab. Remember,
+      the learning is cumulative, so if you don't learn something, next week's
+      lab will seem harder.
+    </p>
+    
+    <h2>Exercise 1: Generating 2D Arrays</h2>
+    <p>
+      Be sure to <span class="codeword">import numpy</span>
+    </p>
+    <p>
+      There are four ways we will generate 2D arrays from scratch, using the
+      following four functions:
+    </p>
+      <div class="code"> 
+<span class="numpy">np.random.random</span>(tuple)
+<span class="numpy">np.zeros</span>(tuple) 
+<span class="numpy">np.ones</span>(tuple) 
+<span class="numpy">np.reshape</span>(vector, tuple)
+      </div>
+      <p>
+        The function 
+        <span class="codeword"><span class="numpy">np.zeros</span>(tuple)</span>
+        creates a 2-D array of <span class="codeword">float</span>s with
+        value <span class="codeword">0.0</span>, according to the dimensions in the tuple.
+        In this lab, our tuples will be 2-tuples of integers, like (10,10).
+        The functions <span class="codeword">np.ones</span> and 
+        <span class="codeword">np.random.random</span> work in the same way.
+      </p>
+      <p> 
+        We can also use <span class="codeword"><span class="numpy">np.reshape</span></span>. 
+        Here, we provide a 1D array containing the elements, and it is reshaped into a
+        2D array.
+      </p>
+      <p class="todo">
+        Try the following examples.
+      </p>
+      <div class="code blk">
+x1 = <span class="numpy">np.random.random</span>((5,5))
+x2 = <span class="numpy">np.zeros</span>((10,10),dtype=<span class="builtin">int</span>)
+x3 = <span class="numpy">np.reshape</span>(<span class="numpy">np.arange</span>(1,13,dtype=int), (4,3))
+      </div>
+      
+
+      <h2>Exercise 2: Indexing 2D Arrays</h2>
+
+      <p>
+        To index a 2D array, use a tuple with two integer indexes. For example, if 
+        <span class="codeword">A</span> is a 3x5 array, then 
+        <span class="codeword">A[2,4]</span> is a valid index for the array, but 
+        <span class="codeword">A[4,2]</span> is not.  
+        <span class="codeword">A.shape</span> will show the dimensions of any numpy array.
+      </p>
+
+      <p class="todo">
+        Try the following examples.
+      </p>
+      <div class="code blk">
+nums = <span class="numpy">np.reshape</span>(<span class="numpy">np.arange</span>(1,13,dtype=<span class="builtin">int</span>), (4,3))
+<span class="builtin">print</span> (<span class="string">"nums:\n{0}"</span>.format(nums))    
+<span class="builtin">print</span> (nums.shape)
+<span class="builtin">print</span> ( nums[3,2])
+<span class="builtin">print</span> (nums[2,3]) 
+      </div>
+ 
+      
+      <h2>Exercise 3: Slices of 2D Arrays</h2>
+      <p>
+        2D <span class="codeword">Array</span>s can be sliced in the same way that
+        <span class="codeword">array</span>s can, 
+        except that both dimensions need to be specified.  
+      </p>
+      <p class="todo">
+        Try the following examples.
+      </p>
+      <div class="code">
+nums = <span class="numpy">np.reshape</span>(<span class="numpy">np.arange</span>(1,13,dtype=<span class="builtin">int</span>), (4,3))
+nums2 = nums[1:3,1:3]                       <span class="comment"># slice the array.</span>
+nums[1:3,1:3] = <span class="numpy">np.zeros</span>(nums2.shape)       <span class="comment"># set to zero</span> 
+      </div>
+      <p>
+        Slices can also include a single index, to slice a row or column from an array.
+      </p>
+      <p class="todo">
+        Write a script file with a main method to produce the following arrays:
+      </p>
+      <ul>
+
+        <li>
+          a 5x5 2D <span class="codeword">array</span> of ints that
+          contains 0s along all four boundaries, and 1s at all other
+          positions. That is, an array that looks like this:
+
+<div class="code">
+[[ 0  0  0  0  0]
+ [ 0  1  2  3  0]
+ [ 0  4  5  6  0]
+ [ 0  7  8  9  0]
+ [ 0  0  0  0  0]]
+</div>
+        </li>
+        <li>
+          a 10x10 2D <span class="codeword">array</span> of ints where the entry at
+          position i,j is i * j. That is,  an array like
+<div class="code">
+[[  1.   2.   3.   4.   5.   6.   7.   8.   9.  10.]
+ [  2.   4.   6.   8.  10.  12.  14.  16.  18.  20.]
+ [  3.   6.   9.  12.  15.  18.  21.  24.  27.  30.]
+ [  4.   8.  12.  16.  20.  24.  28.  32.  36.  40.]
+ [  5.  10.  15.  20.  25.  30.  35.  40.  45.  50.]
+ [  6.  12.  18.  24.  30.  36.  42.  48.  54.  60.]
+ [  7.  14.  21.  28.  35.  42.  49.  56.  63.  70.]
+ [  8.  16.  24.  32.  40.  48.  56.  64.  72.  80.]
+ [  9.  18.  27.  36.  45.  54.  63.  72.  81.  90.]
+ [ 10.  20.  30.  40.  50.  60.  70.  80.  90. 100.]]
+</div>
+
+      </ul>
+<p>
+  For each of these arrays, you should construct them without the use of nested loops. 
+  You will probably need one or more loops for constructing the lists. Do not use 
+  np.array to construct the arrays. 
+</p>
+
+
+    </div>
+      <h2>Exercise 4: Matrix Operations</h2>
+
+<p>
+  For all of the following questions, A and B are square matrices.  For each function, 
+  test your method with parameters to verify if it is working.
+</p>
+
+<ul>
+  <li> 
+    The determinant of a 2x2 matrix is A is given by
+    <br />
+    <img src="l9-2.jpg" />
+    <br />
+    Write a function <span class="codeword">det2</span> that takes a 2x2
+    matrix and returns the determinant of the matrix.
+    Use an <span class="codeword">if</span> statement to verify that the shape is
+    the tuple <span class="codeword">(2, 2)</span>. If it is, return the determinant;
+    otherwise return the python constant <span class="codeword">None</span>.
+  </li>
+
+  <li> 
+    The determinant of a 3x3 matrix A is given by 
+    <br/>
+    <img src="l9-3.jpg" />
+    <br />
+    Write a function <span class="codeword">det3</span> that takes a
+    matrix and returns the determinant if the matrix is a 3x3 matrix.
+    Use <span class="codeword">det2</span> to compute your result. Again,
+    use an if statement to verify that the shape of the matrix is (3, 3).
+    If not, return <span class="codeword">None</span>. Hint: use
+    slices, including steps, to get the three submatrices you need. You
+    do not need loops.
+  </li>
+
+  <li>
+    A and B are inverses of each other if A@B (the matrix product of A
+    and B) is the identity matrix (the matrix with 1s along the main
+    diagonal and 0s everywhere else). Write a function 
+    <span class="codeword">areInverses</span> that takes two matrices and
+    returns True only if the matrices are inverses of each other. Verify 
+    that the matrices are square and have the same shape; if not, return
+    <span class="codeword">None</span>.
+    When comparing matrices, use the <span class="numpy">np.isclose</span>
+    function. It compares the matrices element by element and produces a
+    matrix of <span class="codeword">bool</span> values. Use a relative tolerance
+    of 1e-10.  Create an identity matrix by using the <span
+    class="codeword">np.eye(n)</span> function, which creates an identity matrix
+    of size n.)
+  </li>
+</ul>
+
+
+  </body>
+</html>

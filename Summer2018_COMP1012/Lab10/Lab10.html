@@ -1,0 +1,143 @@
+<html>
+  <head>
+    <meta content="text/html; charset=windows-1252" http-equiv="content-type">
+    <title>Lab 10: Matplotlib</title>
+    <link rel="stylesheet" type="text/css" href="COMP1012Lab.css">
+  </head>
+  <body>
+    <div class="default">
+
+      <h1 style="font-size:20pt">COMP 1012 Lab 10</h1>
+      <p><strong>November 27 to December 1, 2017</strong> </p>
+      <h2>Material covered:</h2>
+      <ul>
+        <li><span class="codeword">matplotlib</span>.</li>
+      </ul>
+      <h2>Notes:</h2>
+      <p> 
+        All Python exercises are to be done using <span class="codeword">Anaconda
+        Python</span> Integrated Development Environment.
+      </p>
+      <p>
+        At some point during the lab, the demonstrator will circulate an
+        attendance sheet. Sign it and pass it on.
+      </p>
+      <p>
+        It is difficult to create a lab that will keep every student occupied
+        for exactly 50 minutes. If you are finished early, use the time to
+        explore other options in your programs, or to help others around you.
+        Most learning takes place when you try to do something and you don't
+        know how at first. If you do not finish in the time available, look at
+        the rest of the lab at some other time before next week's lab. Remember,
+        the learning is cumulative, so if you don't learn something, next week's
+        lab will seem harder.
+      </p>
+      
+<h2>Exercise 1: The Graphics backend</h2>
+
+<p>
+  <span class="codeword">matplotlib</span> plots are displayed using various tools. It
+  is useful to know the benefits of these tools, and how to choose them. The <em>Graphics
+  backend</em> specifies how plots are displayed.
+</p>
+<p>
+  To change the Graphics backend:
+</p>
+<ul>
+  <li>
+    Open the <em>Preferences</em> dialog:
+    <ul>
+      <li>In Windows, it is under the <em>Tools</em> menu</li>
+      <li>In MacOS, it is under the <em>Spyder</em> menu</li>
+    </ul>
+  </li>
+  <li>
+    In the left pane, choose <em>IPython console</em>
+  </li>
+  <li>
+    In the right pane, choose <em>Graphics</em>
+  </li>
+  <li>
+    Select an option from the <em>Backend</em> list:
+    <ul>
+      <li>
+        <em>Inline</em>; the plot appears in the console itself
+        (quick, but not adjustable or saveable)
+      </li>
+      <li>
+        <em>Automatic</em>; the plot appears in a separate window
+        (can resize the plot and save as a png image, but cannot see multiple plots)
+      </li>
+    </ul>
+  </li>
+</ul>
+<p>
+  You may need to close the current IPython console for the change to take effect. You will
+  use the <em>Automatic</em> backend for exercises 2 and 4, and the 
+  <em>Inline</em> backend for exercise 3.
+</p>
+
+<h2>Exercise 2: Plotting functions</h2>
+
+<p>
+  Before you can do anything with plots, you need to 
+  <span class="codeword">import matplotlib.pyplot</span>
+</p>
+
+<div class="code"> 
+  <span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+</div>
+
+<p>
+  Generate 10 closely spaced <span class="math"><i>x</i></span> values 
+  between 1 and 5 using <span class="codeword">np.linspace</span>. 
+  Then evaluate the following functions of <span class="math"><i>x</i></span>, 
+  and plot them versus <span class="math"><i>x</i></span>:
+</p>
+<ul>
+	<li>f(x) = 1 + x**2</li>
+	<li>f(x) = 1 + x**3</li>
+	<li>f(x) = 1 + x**4</li>
+</ul>
+
+
+
+<p>
+  Ensure that your calculations are <span class="math">vectorized</span> when 
+  evaluating the functions. That is, use array operations whenever possible.
+</p>
+<p class="todo">Create a function that generates x values using <span class="codeword">np.linspace</span>. Create a function with a parameter for each of the equation given above and return the y values. The parameter accepts x values. Append the y values 
+        in a numpy array in  the main function. Create a new function that generates the plot with parameter x values, y values and function names.
+        So this function should have 3 parameters. Generate a plot as given below.</p>
+
+
+
+
+<p>
+  The functions <span class="codeword">plt.xlabel</span>, 
+  <span class="codeword">plt.ylabel</span>, and 
+  <span class="codeword">plt.title</span> each create a text string at an appropriate 
+  location in the plot. The function <span class="codeword">plt.legend</span> 
+  creates a box with labels for each of the different plot objects. The function names will be 
+    the parameter for <span class="codeword">plt.legend</span>
+</p>
+<p>
+  <img src="plots.png" alt="" />
+</p>
+
+
+
+<h2>Exercise 3: Working with functions</h2>
+
+<p class="todo">
+  In your script file, replace all the calls to <span class="codeword">plt.plot</span> 
+  with calls to <span class="codeword">plt.loglog</span>, then 
+  <span class="codeword">plt.semilogx</span>, then 
+  <span class="codeword">plt.semilogy</span>. What is the difference between each?
+</p>
+
+
+<hr /> 
+</div>
+</body>
+</html>
