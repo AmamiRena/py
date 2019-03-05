@@ -34,8 +34,8 @@ def main(stdscr):
 	state_actions={'Init':init, 'Win':lambda:not_game('Win'),'Gameover':lambda: not_game('Gameover'), 'Game':game}
 	state='Init'
 	curses.use_default_colors()
-	game_field=GameField(win=256)
-    #256算赢
+	game_field=GameField()
+    #默认2048赢
 	while state!='Exit':
 		state=state_actions[state]()
 
