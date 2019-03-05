@@ -1,6 +1,7 @@
 # Don't read this
 ## win number is set to 256
 写了半天，debug了一天，再玩了半天居然没有2048过..
+-----------------------------------
 starting interface:
 2048.py
 ```
