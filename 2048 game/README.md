@@ -2,6 +2,7 @@
 ## win number is set to 256
 写了半天，debug了一天，再玩了半天居然没有2048过..
 -----------------------------------
+![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
 starting interface:
 2048.py
 ```
