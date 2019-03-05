@@ -1,6 +1,5 @@
 # Don't read this
-## win number is set to 256
-写了半天，debug了一天，再玩了半天居然没有2048过..
+## win number in 2048_score.py is set to 256
 -----------------------------------
 ![2048 flow chart](https://github.com/AmamiRena/py/blob/master/2048%20game/2048.gv.png)
 -----------------------------------
@@ -20,7 +19,7 @@ starting interface:
 (R)やり直す (Q)終了する
 
 +-----+-----+-----+-----+
-|  2  |  4  | 32  |  4  |yaktocat.png
+|  2  |  4  | 32  |  4  |
 +-----+-----+-----+-----+
 |  4  | 64  |  8  |  2  |
 +-----+-----+-----+-----+
