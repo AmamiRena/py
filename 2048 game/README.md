@@ -1,5 +1,5 @@
-## Don't read this
-I set win number to 256
+# Don't read this
+## I set win number to 256
 starting interface:
 2048.py
 ```
