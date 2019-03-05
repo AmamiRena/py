@@ -1,0 +1,16 @@
+digraph {
+	A [label=init]
+	B [label=gamefield]
+	C [label=win]
+	D [label=gameover]
+	E [label=exit]
+	A -> B [label=init]
+	B -> A [label=restart]
+	C -> A [label=restart]
+	D -> A [label=restart]
+	B -> C [label=win]
+	B -> D [label=gameover]
+	B -> E [label=exit]
+	C -> E [label=exit]
+	D -> E [label=exit]
+}
