@@ -1,6 +1,5 @@
 # Don't read this
 ## win number in 2048_score.py is set to 256
------------------------------------
 ![2048 flow chart](https://github.com/AmamiRena/py/blob/master/2048%20game/2048.gv.png)
 -----------------------------------
 starting interface:
