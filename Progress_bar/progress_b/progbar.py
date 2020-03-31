@@ -31,7 +31,7 @@ class progBar(prog):
 
     def _print_progress_bar(self,progress):
         remaining=self.bar_width-progress
-        self._stream_out('[{}{}]'.format(self.bat_chart*int(progress),' '*int(remaining)))
+        self._stream_out('[{}{}]'.format(self.bar_char*int(progress),' '*int(remaining)))
         self._stream_flush()
     
     def _print(self,force_flush=False):

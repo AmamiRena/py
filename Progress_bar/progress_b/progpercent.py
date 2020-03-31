@@ -1,4 +1,4 @@
-from progress_b import prog
+from progress_b.prog_class import prog
 import time
 
 class progPercent(prog):

@@ -21,7 +21,7 @@ class prog():
         self.total_time=0.0
         self.last_time=self.start
         self.monitor=monitor
-        self.stram=stream
+        self.stream=stream
         self.active=True
         self._stream_out=None
         self._stream_flush=None
