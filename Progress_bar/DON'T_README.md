@@ -2,9 +2,10 @@
 ## single progress bar class implemented
 -----------------------------------
 First, run python Test.py to check:
+python Test.py
 '''
-% python Test.py
-% 1~4: 1
+1~4: 1
+
 0%                          100%
 [██████████████████████████████] | ETA: 00:00:00
 Total time elapsed: 00:00:05
@@ -17,8 +18,8 @@ Total time elapsed: 00:00:05
 '''
 
 '''
-% python Test.py
-% 1~4: 2
+1~4: 2
+
 0%                          100%
 [██████████████████████████████] | ETA: 00:00:00
 Total time elapsed: 00:00:05
