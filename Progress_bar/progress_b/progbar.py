@@ -3,7 +3,7 @@ from progress_b.prog_class import prog
 import time
 
 class progBar(prog):
-    def __init__(self,iterations,track_time=True,width=30,bar_char='#',stream=2,title='',monitor=False,update_interval=None):
+    def __init__(self,iterations,track_time=True,width=30,bar_char='█',stream=2,title='',monitor=False,update_interval=None):
         prog.__init__(self,iterations,track_time,stream,title,monitor,update_interval)
         self.bar_width=width
         self._adjust_width()
