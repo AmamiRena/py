@@ -8,7 +8,249 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
 
 ```{r}
-plot(cars)
+data.all<-read.csv('MSHA_Mine_Data_2013-2016.csv')
+```
+
+```{r}
+summary(data.all)
+```
+
+```{r}
+data.nomissing <- data.all[!is.na(data.all$MINE_STATUS),]
+data.nomissing <- data.nomissing[!is.na(data.nomissing$US_STATE),]
+data.nomissing <- data.nomissing[!is.na(data.nomissing$PRIMARY),]
+nrow(data.all) - nrow(data.nomissing)
+summary(data.nomissing)
+```
+
+```{r}
+length(levels(data.all$PRIMARY))
+length(levels(data.all$US_STATE))
+data.reduced <- data.nomissing
+data.reduced$PRIMARY <- NULL
+data.reduced$US_STATE <- NULL
+```
+
+```{r}
+library(ggplot2)
+p1 <- ggplot(data = data.reduced, aes(x=AVG_EMP_TOTAL, y=EMP_HRS_TOTAL)) + geom_point()
+p1 + scale_x_log10() + scale_y_log10()
+```
+
+```{r}
+data.reduced$inj_rate_2k<-data.reduced$NUM_INJURIES/(data.reduced$EMP_HRS_TOTAL/2000)
+ggplot(data.reduced,aes(x=inj_rate_2k))+geom_histogram()
+summary(data.reduced$inj_rate_2k)
+```
+
+```{r}
+data.reduced[data.reduced$inj_rate_2k==2000,]
+ggplot(data.reduced,aes(x=EMP_HRS_TOTAL))+geom_histogram()
+```
+
+```{r}
+ggplot(data.reduced[data.reduced$EMP_HRS_TOTAL<=10000,],aes(x=EMP_HRS_TOTAL))+geom_histogram()
+```
+
+```{r}
+summary(data.reduced[data.reduced$EMP_HRS_TOTAL < 2000,])
+```
+
+```{r}
+table(data.reduced$MINE_STATUS[data.reduced$EMP_HRS_TOTAL < 2000])/table(data.reduced$MINE_STATUS)
+```
+
+```{r}
+remove<-c("Closed by MSHA","Non-producing","Permanently abandoned","Temporarily closed")
+data.reduced2<-data.reduced
+for (n in 1:length(remove)){
+  data.reduced2<-data.reduced2[data.reduced2$MINE_STATUS!=remove[[n]],]
+}
+summary(data.reduced2$MINE_STATUS)
+```
+
+```{r}
+ggplot(data.reduced2,aes(x=inj_rate_2k))+geom_histogram()
+```
+
+```{r}
+ggplot(data.reduced2[data.reduced2$EMP_HRS_TOTAL<=10000,],aes(x=EMP_HRS_TOTAL))+geom_histogram()
+```
+
+```{r}
+data.reduced3<-data.reduced2[data.reduced2$EMP_HRS_TOTAL>=2000,]
+ggplot(data.reduced3,aes(x=inj_rate_2k))+geom_histogram()
+```
+
+```{r}
+table(data.reduced3$MINE_STATUS,data.reduced3$COMMODITY)
+data.reduced3$status<-NULL
+data.reduced3$status[data.reduced3$MINE_STATUS=='Active']<-'Open'
+data.reduced3$status[data.reduced3$MINE_STATUS=='Full-time permanent']<-'Open'
+data.reduced3$status[data.reduced3$MINE_STATUS=='Intermittent']<-'Intermittent'
+data.reduced3$status<-as.factor(data.reduced3$status)
+data.reduced3$MINE_STATUS<-NULL
+```
+
+```{r}
+summary(data.reduced3$inj_rate_2k[data.reduced3$YEAR==2013])
+summary(data.reduced3$inj_rate_2k[data.reduced3$YEAR==2014])
+summary(data.reduced3$inj_rate_2k[data.reduced3$YEAR==2015])
+summary(data.reduced3$inj_rate_2k[data.reduced3$YEAR==2016])
+data.reduced3$YEAR<-NULL
+```
+
+```{r}
+ggplot(data.reduced3,aes(x=COMMODITY,y=inj_rate_2k))+geom_boxplot()
+ggplot(data.reduced3[data.reduced3$inj_rate_2k<=1,],aes(x=COMMODITY,y=inj_rate_2k))+geom_boxplot()
+```
+
+```{r}
+set.seed(1234)
+partition <- createDataPartition(data.reduced3$inj_rate_2k, list = FALSE, p = .75)
+train <- data.reduced3[partition, ]
+test <- data.reduced3[-partition, ]
+print('train')
+mean(train$inj_rate_2k)
+print('test')
+mean(test$inj_rate_2k)
+```
+
+# Decision Tree
+
+```{r}
+library(rpart)
+library(rpart.plot)
+set.seed(153)
+tree.reduced<-rpart(cbind(EMP_HRS_TOTAL/2000,NUM_INJURIES)~.-EMP_HRS_TOTAL,data=train,method='poisson',control=rpart.control(minbucket=25,cp=0,maxdepth = 10))
+plotcp(tree.reduced)
+```
+
+```{r}
+tree.reduced.pruned<-prune(tree.reduced,cp=tree.reduced$cptable[which.min(tree.reduced$cptable[,'xerror']),'CP'])
+rpart.plot(tree.reduced.pruned)
+printcp(tree.reduced.pruned)
+tree.reduced.pruned
+```
+```{r}
+LLfunction <- function(targets, predicted_values){
+  p_v_zero <- ifelse(predicted_values <= 0, 0, predicted_values)
+  p_v_pos <- ifelse(predicted_values <= 0, 0.000001 ,predicted_values)
+  return(sum(targets*log(p_v_pos)) - sum(p_v_zero))
+}
+```
+
+```{r}
+pruned.predict <- (test$EMP_HRS_TOTAL/2000)*predict(tree.reduced.pruned, newdata = test, type = "vector")
+print('loglikelihood')
+LLfunction(test$NUM_INJURIES,pruned.predict)
+```
+
+```{r}
+set.seed(153)
+tree.reduced<-rpart(cbind(EMP_HRS_TOTAL/2000,NUM_INJURIES)~.-EMP_HRS_TOTAL-inj_rate_2k,data=train,method='poisson',control=rpart.control(minbucket = 25,cp=0,maxdepth = 10))
+plotcp(tree.reduced)
+tree.reduced.pruned<-prune(tree.reduced,cp=tree.reduced$cptable[which.min(tree.reduced$cptable[,'xerror']),'CP'])
+rpart.plot(tree.reduced.pruned)
+printcp(tree.reduced.pruned)
+tree.reduced.pruned
+pruned.predict<-(test$EMP_HRS_TOTAL/2000)*predict(tree.reduced.pruned,newdata=test,type='vector')
+print('loglikelihood')
+LLfunction(test$NUM_INJURIES,pruned.predict)
+```
+```{r}
+tree1<-rpart(cbind(EMP_HRS_TOTAL/2000,NUM_INJURIES)~.-EMP_HRS_TOTAL-inj_rate_2k,data=train,method='poisson',control=rpart.control(minbucket=25,cp=.05,maxdepth=10))
+plotcp(tree1)
+tree.pruned1<-prune(tree1,cp=tree1$cptable[which.min(tree1$cptable[,'xerror']),'CP'])
+rpart.plot(tree.pruned1)
+printcp(tree.pruned1)
+tree.pruned1
+
+tree.train.predict1<-(train$EMP_HRS_TOTAL/2000)*predict(tree.pruned1,newdata=train,type='vector')
+tree.test.predict1<-(test$EMP_HRS_TOTAL/2000)*predict(tree.pruned1,newdata=test,type='vector')
+print('loglikelihood between train and test')
+ll.train.1<-LLfunction(train$NUM_INJURIES,tree.train.predict1)
+ll.test.1<-LLfunction(test$NUM_INJURIES,tree.test.predict1)
+print('train')
+print(ll.train.1)
+print('test')
+print(ll.test.1)
+```
+```{r}
+set.seed(123)
+tree2<-rpart(cbind(EMP_HRS_TOTAL/2000,NUM_INJURIES)~.-EMP_HRS_TOTAL-inj_rate_2k,data=train[,!(names(train)%in%'US_STATE')],method='poisson',control=rpart.control(minbucket = 25,cp=.0005,maxdepth=10))
+tree.pruned2<-prune(tree2,cp=tree2$cptable[which.min(tree2$cptable[,'xerror']),'CP'])
+rpart.plot(tree.pruned2)
+plotcp(tree2)
+printcp(tree2)
+print('Min cp')
+print(min(tree2$cptable[,'xerror']))
+print('where is min cp')
+print(tree2$cptable[which.min(tree2$cptable[,'xerror']),'CP'])
+```
+
+```{r}
+tree.pruned3<-prune(tree2,cp=tree2$cptable[4,'CP'])
+rpart.plot(tree.pruned3)
+printcp(tree.pruned3)
+tree.pruned3
+```
+
+```{r}
+(test$EMP_HRS_TOTAL/2000)*predict(tree.pruned2,newdata=test,type='vector')
+```
+
+```{r}
+tree.test.predict2<-(test$EMP_HRS_TOTAL/2000)*predict(tree.pruned2,newdata=test,type='vector')
+
+tree.train.predict3<-(train$EMP_HRS_TOTAL/2000)*predict(tree.pruned3,newdata=test,type='vector')
+tree.test.predict3<-(test$EMP_HRS_TOTAL/2000)*predict(tree.pruned3,newdata=test,type='vector')
+
+print('loglikelihood between train and test')
+ll.test.2<-LLfunction(test$NUM_INJURIES,tree.test.predict2)
+ll.test.3<-LLfunction(test$NUM_INJURIES,tree.test.predict3)
+ll.train.3<-LLfunction(train$NUM_INJURIES,tree.train.predict3)
+
+print('test2')
+print(ll.test.2)
+
+print('test3')
+print(ll.test.3)
+```
+
+#GLM
+
+```{r}
+glm.reduced<-glm(NUM_INJURIES~.-EMP_HRS_TOTAL,family=poisson(),offset=log(EMP_HRS_TOTAL/2000),data=data.reduced)
+summary(glm.reduced)
+
+glm.predict<-predict(glm.reduced,newdata=data.reduced,type='response')
+print('loglikelihood')
+LLfunction(data.reduced$NUM_INJURIES,glm.predict)
+```
+
+```{r}
+table(data.reduced3$COMMODITY,data.reduced3$TYPE_OF_MINE)
+
+data.reduced4<-data.reduced3
+data.reduced4$mine_char<-paste(data.reduced4$TYPE_OF_MINE,data.reduced4$COMMODITY)
+data.reduced4$mine_char<-relevel(as.factor(data.reduced4$mine_char),ref='Sand & gravel Sand & gravel')
+
+data.reduced4$mine_char
+data.reduced4$log_avg_emp_total<-log(data.reduced4$AVG_EMP_TOTAL)
+data.reduced4$AVG_EMP_TOTAL<-NULL
+
+trainGLM<-data.reduced4[partition,]
+testGLM<-data.reduced4[-partition,]
+
+print('train')
+mean(trainGLM$inj_rate_2k)
+print('test')
+mean(testGLM$inj_rate_2k)
+
+summary(data.reduced4[data.reduced4$mine_char=='Sand & gravel Sand & gravel',])
+
+
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
