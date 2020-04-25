@@ -1,0 +1,296 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+dat<-read.csv('2019-06-13-exam-pa-data-file.csv')
+summary(dat)
+vars<-colnames(dat)[5:14]
+for (i in vars){
+  table <- as.data.frame(table(dat[,i]))
+  max <- which.max(table[,2])
+  level.name <- as.character(table[max,1])
+  dat[,i] <- relevel(dat[,i], ref = level.name)
+}
+summary(dat)
+```
+
+Task 1
+
+```{r}
+library(ggplot2)
+p<-ggplot(dat,aes(x=Crash_Score))+geom_histogram()
+p
+```
+
+```{r}
+vars <- colnames(dat)[colnames(dat)!="Crash_Score"]
+for (i in vars) {
+  plot <- ggplot(dat, aes(x=as.factor(dat[,i]),y=Crash_Score)) + geom_boxplot() + labs(x=i)
+  print(plot)
+}
+```
+
+```{r}
+library(plyr)
+library(dplyr)
+for (i in vars) {
+  print(i)
+  x <- dat %>% group_by_(i)%>%summarise(mean=mean(Crash_Score),
+                                   median=median(Crash_Score),
+                                   n = n())
+
+  print(x)
+}
+```
+
+Task 2
+
+```{r}
+vars <- colnames(dat)[colnames(dat)!="Crash_Score"]
+for (i in vars) {
+  plot <- ggplot(dat, aes(x=dat[,i])) + geom_bar() + labs(x=i) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  print(plot)
+}
+```
+
+```{r}
+dat2<-dat
+
+library(plyr)
+var<-'Traffic_Control'
+var.levels<-levels(dat2[,var])
+dat2[,var]<-mapvalues(dat2[,var],var.levels,c('OTHER','OTHER','SIGNAL-STOP','SIGNAL-STOP','OTHER'))
+
+table<-as.data.frame(table(dat2[,var]))
+max<-which.max(table[,2])
+level.name<-as.character(table[max,1])
+dat2[,var]<-relevel(dat2[,var],ref=level.name)
+
+table(dat2[,var])
+```
+
+```{r}
+var<-'Rd_Character'
+dat2[,var]<-as.factor(dat2[,var])
+var.levels<-levels(dat2[,var])
+dat2[,var]<-mapvalues(dat2[,var],var.levels,c('STRAIGHT','CURVE','CURVE','CURVE','CURVE','STRAIGHT','STRAIGHT'))
+table <- as.data.frame(table(dat2[,var]))
+  max <- which.max(table[,2])
+  level.name <- as.character(table[max,1])
+  dat2[,var] <- relevel(dat2[,var], ref = level.name)
+table(dat2[,var])
+```
+
+```{r}
+var<-'Rd_Feature'
+dat2[,var]<-as.factor(dat2[,var])
+var.levels<-levels(dat2[,var])
+dat2[,var]<-mapvalues(dat2[,var],var.levels,c('OTHER','OTHER','INTERSECTION','OTHER','OTHER'))
+table <- as.data.frame(table(dat2[,var]))
+  max <- which.max(table[,2])
+  level.name <- as.character(table[max,1])
+  dat2[,var] <- relevel(dat2[,var], ref = level.name)
+table(dat2[,var])
+```
+
+```{r}
+var<-'Time_of_Day'
+dat2[,var]<-as.factor(dat2[,var])
+var.levels<-levels(dat2[,var])
+dat2[,var]<-mapvalues(dat2[,var],var.levels,c('OVERNIGHT','LATE-EARLY','DAYTIME','DAYTIME','DAYTIME','LATE-NIGHT'))
+table <- as.data.frame(table(dat2[,var]))
+  max <- which.max(table[,2])
+  level.name <- as.character(table[max,1])
+  dat2[,var] <- relevel(dat2[,var], ref = level.name)
+table(dat2[,var])
+```
+
+```{r}
+var<-'Rd_Surface'
+dat2[,var] <- as.factor(dat2[,var])
+var.levels <- levels(dat2[,var])
+dat2[,var] <- mapvalues(dat2[,var],var.levels,c('ASPHALT','ASPHALT','OTHER','OTHER','OTHER'))
+table <- as.data.frame(table(dat2[,var]))
+  max <- which.max(table[,2])
+  level.name <- as.character(table[max,1])
+  dat2[,var] <- relevel(dat2[,var], ref = level.name)
+table(dat2[,var])
+```
+
+Task 3
+
+```{r}
+datPCA<-dat[,c('Rd_Conditions','Light','Weather')]
+
+library(caret)
+
+varsPCA<-colnames(datPCA)
+for (var in varsPCA) {
+  datPCA[,var]<-as.character(datPCA[,var])
+}
+
+binarizer<-caret::dummyVars(paste('~',paste(varsPCA,collapse='+')),data=datPCA,fullRank=FALSE)
+datPCAbin<-data.frame(predict(binarizer,newdata=datPCA))
+head(datPCAbin)
+```
+```{r}
+PCAweather <- prcomp(datPCAbin, center = TRUE, scale. = TRUE)
+summary(PCAweather)
+PCAweather$rotation
+```
+
+```{r}
+datPCAbin.std<-as.data.frame(scale(datPCAbin))
+#dat2<-dat
+dat2$WETorDRY<-0.51*datPCAbin.std$Rd_ConditionsDRY+0.5*datPCAbin.std$Rd_ConditionsWET-0.46*datPCAbin.std$WeatherCLEAR+0.43*datPCAbin.std$WeatherRAIN
+summary(dat2$WETorDRY)
+```
+
+```{r}
+dat<-dat2
+dat$Rd_Conditions<-NULL
+dat$Weather<-NULL
+summary(dat)
+```
+
+Task 4
+
+```{r}
+ggplot(dat,aes(x=Rd_Character,y=log(Crash_Score),fill=Rd_Class))+
+  geom_boxplot()+
+  facet_wrap(~Rd_Character,scale="free")
+```
+
+```{r}
+ggplot(dat,aes(x=Traffic_Control,y=log(Crash_Score),fill=Rd_Feature))+
+  geom_boxplot()+
+  facet_wrap(~Traffic_Control,scale="free")
+```
+
+Task 5
+
+```{r}
+dat$Month<-as.factor(dat$Month)
+levels(dat$Month)
+```
+
+```{r}
+library(caret)
+set.seed(1234)
+
+partition<-createDataPartition(dat$Crash_Score,list=FALSE,p=.75)
+train<-dat[partition, ]
+test<-dat[-partition, ]
+
+print('TRAIN')
+mean(train$Crash_Score)
+
+print('TEST')
+mean(test$Crash_Score)
+```
+
+```{r}
+GLMols<-glm(Crash_Score~.,family = gaussian(),data=train)
+summary(GLMols)
+print('AIC')
+AIC(GLMols)
+predict<-predict(GLMols,newdata=test,type='response')
+print('RMSE')
+sqrt(sum((test$Crash_Score-predict)^2)/nrow(test))
+```
+
+```{r}
+GLMgamma<-glm(Crash_Score~.+Traffic_Control:Rd_Feature,family = Gamma(link = 'log'),data=train)
+summary(GLMgamma)
+print('AIC')
+AIC(GLMgamma)
+predict<-predict(GLMgamma,newdata=test,type='response')
+print('RMSE')
+sqrt(sum((test$Crash_Score-predict)^2)/nrow(test))
+```
+
+```{r}
+GLMnorm<-glm(Crash_Score~.+Traffic_Control:Rd_Feature,family = gaussian(link = 'log'),data=train)
+summary(GLMnorm)
+print('AIC')
+AIC(GLMnorm)
+predict<-predict(GLMnorm,newdata=test,type='response')
+print('RMSE')
+sqrt(sum((test$Crash_Score-predict)^2)/nrow(test))
+```
+
+```{r}
+library(MASS)
+GLMgamma1<-glm(Crash_Score~1,family = Gamma(link='log'),data=train)
+stepAIC(GLMgamma1,direction = 'forward',k=log(nrow(train)),scope=list(upper=GLMgamma,lower=GLMgamma1))
+```
+
+```{r}
+GLMgammaR<-glm(Crash_Score~Rd_Class+Rd_Feature+Time_of_Day+Traffic_Control,family=Gamma(link='log'),data=train)
+summary(GLMgammaR)
+print('AIC')
+AIC(GLMgammaR)
+predict<-predict(GLMgammaR,newdata=test,type='response')
+print('RMSE')
+sqrt(sum((test$Crash_Score-predict)^2)/nrow(test))
+```
+
+```{r}
+plot(GLMgammaR)
+```
+
+Task 8
+
+```{r}
+GLMgammaRdat<-glm(Crash_Score ~ Rd_Class + Rd_Feature + Time_of_Day+Traffic_Control,family = Gamma(link='log'),data=dat)
+summary(GLMgammaRdat)
+```
+
+Task 9
+
+```{r}
+set.seed(42)
+X<-model.matrix(Crash_Score~.+Traffic_Control:Rd_Feature,train)
+m<-cv.glmnet(x=X,y=train$Crash_Score,family='gaussian',alpha=1)
+plot(m)
+```
+
+```{r}
+m.best<-glmnet(x=X,y=train$Crash_Score,family='gaussian',lambda=m$lambda.min,alpha=1)
+X.test<-model.matrix(Crash_Score~.+Traffic_Control:Rd_Feature,test)
+m.best$beta
+m.best.predict<-predict(m.best,newx=X.test)
+rmse<-sqrt(sum((m.best.predict-test$Crash_Score)^2)/nrow(test))
+rmse
+```
+
+```{r}
+set.seed(42)
+X<-model.matrix(Crash_Score~.+Traffic_Control:Rd_Feature,train)
+m<-cv.glmnet(x=X,y=train$Crash_Score,family='gaussian',alpha=0)
+plot(m)
+```
+
+```{r}
+m.best<-glmnet(x=X,y=train$Crash_Score,family='gaussian',lambda=m$lambda.min,alpha=0)
+X.test<-model.matrix(Crash_Score~.+Traffic_Control:Rd_Feature,test)
+m.best$beta
+m.best.predict<-predict(m.best,newx=X.test)
+rmse<-sqrt(sum((m.best.predict-test$Crash_Score)^2)/nrow(test))
+rmse
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
