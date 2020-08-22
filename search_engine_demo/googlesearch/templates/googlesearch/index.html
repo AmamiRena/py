@@ -1,0 +1,65 @@
+{% extends 'googlesearch/base.html' %} {% block content %}
+<section class="hero is-white is-fullheight">
+
+    <div id="particles-js"></div>
+    <!-- div style='background-image: url("https://i.epochtimes.com/assets/uploads/2006/10/610200453411456-600x400.jpg");' -->
+
+    <div class="text">
+        <h1>Background</h1>
+        <p>Using
+            <a href="https://github.com/VincentGarreau/particles.js/">ParticlesJS</a> and well.. that's about it, actually ¯\_(ツ)_/¯</p>
+            <!-- a src='https://i.epochtimes.com/assets/uploads/2006/10/610200453411456-600x400.jpg'></a></p -->
+    </div>
+
+
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            <h1 class="is-size-3 text-logo">
+                <a href='http://ghappy.org'>
+                    <img src='https://cdn.discordapp.com/attachments/719586191749677179/720813943764942928/gold.png' title='G East-Point' width=120 height=120 style='position:relative;top:40px;' id='icon'>
+                </a>
+                <a href='http://blog.tianya.cn/blogger/post_show.asp?BlogID=282231&PostID=3525130'>
+                    <strong>文可</strong>Voice Search</h1>
+                </a>
+            <br>
+            <br>
+            <div class="columns">
+                <div class="column is-6-desktop is-offset-3-desktop">
+                    <form action="{% url 'google-search-view' %}" method="get">
+                        <div class="field">
+                            <div class="control has-icons-right">
+                                <input class="input is-medium" type="text" placeholder='请输入关键词...' autofocus="true" name="q" id="search-input">
+                                <div class="output"></div>
+                                <span class="icon is-medium is-right">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control has-text-centered">
+                            <input class="button is-light is-medium" type="submit" value="La Porte de l'Enfer">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="content has-text-centered">
+                <p class="has-text-grey">
+                    <i class="fa fa-heart"></i> for 蚂蚁军团
+                </p>
+                <!-- p class="has-text-grey">
+                    &copy; copyright.
+                    <strong>TKCBI</strong>
+                </p -->
+            </div>
+        </div>
+    </footer>
+
+</section>
+
+
+
+{% endblock %}

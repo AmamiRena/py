@@ -1,0 +1,89 @@
+{% extends 'googlesearch/base.html' %} {% block content %}
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js'></script>
+
+<section class="hero is-light" id="result">
+
+    <div class="hero-body">
+        <div class="columns">
+            <div class="column is-1">
+                <form action="">
+                    <div class="field">
+                        <div class="control">
+                            <a href="/" class="title is-3">
+                                <img src='https://cdn.discordapp.com/attachments/719586191749677179/720813943764942928/gold.png' title='G East-Point' width=75 height=75 style='position:absolute;left:5px;top:-25px;'>
+                            </a href="/">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="column is-6">
+                <form action="">
+                    <div class="field is-grouped">
+                        <div class="control has-icons-right is-expanded">
+                            <input class="input" type="text" autofocus="true" name="q" id="search-input" value={{search_terms}}>
+                            <div class="output"></div>
+                        </div>
+                        <div class="control has-text-centered">
+                            <button class="button is-blue" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class='sub'>
+            <span class='options'>Web</span>
+            <span class='options'>
+                Video
+            </span>
+        </div>
+    </div>
+</section>
+
+
+<section class="hero is-white">
+    <div class="hero-body" style="padding-top: 1em;">
+        <div class="columns">
+            <div class="column is-6 is-offset-1">
+                {% load search_tags %}
+
+                <div class="has-text-grey" style="padding-left:10px;" id='barh'>
+                    <div id='bar1' class='drop0'>
+                        <div id='droptext'>Sort by</div>
+                        <span class='tridown'></span>
+
+                        <div id='dropmenu'>
+                            <div class='dropdown' id=''>Any time</div>
+                            <div class='dropdown' id='d1'>Past 24hr</div>
+                            <div class='dropdown' id='w1'>Past week</div>
+                            <div class='dropdown' id='m1'>Past month</div>
+                            <div class='dropdown' id='y1'>Past year</div>
+                            <script>
+                                $(document).ready(function(){
+                                    $('.dropdown').click(function(){
+                                        $.ajax({
+                                            url:'',
+                                            type:'GET',
+                                            data:{'dateRestrict':$(this).attr('id')},
+                                        });
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+
+                    <div class="search-terms" id='bar1'>{{ total_results }} Gates {{ search_terms }}</div>
+                </div>
+                {% if items %} {% include 'googlesearch/results_list.html' %} {% endif %}
+
+                <div class="">
+                    {% show_pagination %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}

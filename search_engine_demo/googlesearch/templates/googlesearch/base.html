@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-174902992-1"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-174902992-1');
+    </script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>蚂蚁军团欢迎您</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
+    
+    <link rel="stylesheet" href="{% static 'googlesearch/css/app.css' %}">
+
+    <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+
+</head>
+
+<body>
+    {% block content %} {% endblock %}
+    
+    <!-- img src='https://i.epochtimes.com/assets/uploads/2006/10/610200453411456-600x400.jpg' -->
+    <script defer src="{% static 'googlesearch/js/particle-js.min.js' %}"></script>
+    <script defer src="{% static 'googlesearch/js/app.js' %}"></script>
+
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js'></script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script>
+        $(function () {
+            $("#search-input").on("keyup", function (e) {
+                e.stopPropagation();
+                $(".output").html("");
+                $(".output")
+                    .stop()
+                    .show()
+                    .addClass("active");
+                var searchField = $(this).val();
+                var regEx = new RegExp(searchField, "i");
+
+                $.getJSON("http://suggestqueries.google.com/complete/search?q=" + $("#search-input").val() + "&client=firefox&callback=?", function (data) {
+                    $.each(data[1], function (key, value) {
+                        $(".output").append("<a onClick='setInput(\"" + value + "\")' class='list'>" + value + "</a>");
+                    });
+                });
+            });
+
+            $(document).on("click", function (e) {
+                e.stopPropagation();
+                $(".output")
+                    .stop()
+                    .html("")
+                    .hide()
+                    .removeClass("active");
+            });
+
+        });
+
+        function setInput(suggest) {
+            $("#search-input").val(suggest);
+            $(".output")
+                .stop()
+                .html("")
+                .hide()
+                .removeClass("active");
+        };
+    </script>
+    <script>
+        
+    </script>
+</body>
+
+</html>
