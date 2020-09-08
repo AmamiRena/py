@@ -11,4 +11,5 @@ bs3: beautifulsoup(old)
 dicrete...: discrete maths for CS(basic algorithms, brutal force, branch and bound etc.)
 Ziwei_yun: (mini_app for my group)
 search_engine_demo: Django search demo using GOOGLE API
+community_demo: a little Q&A community web built by Django
 ```
