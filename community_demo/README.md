@@ -1,2 +1,2 @@
-![](home_demo.png)
+![](demo_home.png)
 ![](questions.jpg)
