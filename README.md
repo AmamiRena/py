@@ -1,26 +1,26 @@
 # py<br/>
 <br/>
-##Courses<br/>
+## Courses<br/>
 summer...: the university course i took<br/>
 applied...: applied data science courses with python(pandas, matplotlib, scikit-learn, nltk, networkx etc.)<br/>
 dicrete...: discrete maths courses for CS(basic algorithms, brutal force, branch and bound etc.)<br/>
 <br/>
-##Practices<br/>
+## Practices<br/>
 Algorithm: some practices<br/>
 Python:R Comparison: comparison between py/R in terms of data analysis<br/>
 <br/>
-##Scikit-learn&Tensorflow<br/>
+## Scikit-learn&Tensorflow<br/>
 Machine&Deep Learning: Some sort of Machine Learning Stuff<br/>
 <br/>
-##Small play things<br/>
+## Small play things<br/>
 2048 game: 2048<br/>
 Progress_bar: some scripts displaying the progress bar<br/>
 Text_parse: parse text from web<br/>
 <br/>
-##Tkinter<br/>
+## Tkinter<br/>
 Ziwei_yun: (mini_app for my group)<br/>
 <br/>
-##Django<br/>
+## Django<br/>
 search_engine_demo: Django search demo using GOOGLE API<br/>
 community_demo: a little Q&A community web built by Django<br/>
 
