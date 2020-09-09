@@ -1,5 +1,5 @@
 # py
-```
+
 ##Courses
 summer...: the university course i took
 applied...: applied data science courses with python(pandas, matplotlib, scikit-learn, nltk, networkx etc.)
@@ -23,4 +23,4 @@ Ziwei_yun: (mini_app for my group)
 ##Django
 search_engine_demo: Django search demo using GOOGLE API
 community_demo: a little Q&A community web built by Django
-```
+
