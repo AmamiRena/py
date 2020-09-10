@@ -1,7 +1,6 @@
 # py<br/>
 
 ## Courses<br/>
-summer...: the university course i took<br/>
 applied...: applied data science courses with python(pandas, matplotlib, scikit-learn, nltk, networkx etc.)<br/>
 dicrete...: discrete maths courses for CS(basic algorithms, brutal force, branch and bound etc.)<br/>
 
