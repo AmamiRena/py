@@ -24,3 +24,6 @@ Ziwei_yun: (mini_app for my group)<br/>
 search_engine_demo: Django search demo using GOOGLE API<br/>
 community_demo: a little Q&A community web built by Django<br/>
 
+## Python web crawl<br/>
+Spider: web spider using various methods<br/>
+
