@@ -30,5 +30,5 @@ Spider: web spider using various methods<br/>
 ## Python data visualisation practices<br/>
 Python_Visualis: python visualisation matplotlib, seaborn, pyecharts<br/>
 
-## New! Actuary<br/>
-Actuarial related: Basically MFE<br/>
+## Actuary<br/>
+Actuarial related: Basically from Actex MFE<br/>
