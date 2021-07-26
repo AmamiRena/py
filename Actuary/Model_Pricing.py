@@ -1,8 +1,9 @@
 from abc import ABC
 from collections import Iterable
 import numpy as np
-from scipy.optimize import broyden1
+from scipy.optimize import broyden1,minimize
 import pandas as pd
+import simple_cal as rk
 
 class BinomialTree(ABC):
     '''
@@ -683,3 +684,152 @@ class PassThroughMBS(object):
 
             self.data = self.data.append(current_values,ignore_index=True)
             self.data.index+=1
+
+
+#CAPM model
+class CAPM(object):
+    '''
+    3 basic strategies
+    - max sharpe ratio
+    - equally weighted
+    - global min variance portfolio
+    -----------------
+    r: collections of expected returns
+    rr: risk free rate
+    cov: covariance matrix
+    '''
+
+    def __init__(self,r,cov):
+        self.r=r
+        self.cov=cov
+    
+    @property
+    def r(self):
+        return self._r
+    @r.setter
+    def r(self,value):
+        self._r=value
+    
+    @property
+    def cov(self):
+        return self._cov
+    @cov.setter
+    def cov(self,value):
+        self._cov=value
+
+    def min_vol(self,target_r):
+        '''
+        target_r: target return to achieve
+        '''
+        n=self.r.shape[0]
+        init=np.repeat(1/n,n)
+        bounds=((0,1),)*n
+        weights_sum={'type':'eq','fun':lambda weights:np.sum(weights)-1}
+        target_return={'type':'eq','args':(self.r,),'fun':lambda weights,r:target_r-rk.portfolio_return(weights,self.r)}
+        weights=minimize(rk.portfolio_vol,init,args=(self.cov),method='SLSQP',options={'disp':False},constraints=(weights_sum,target_return),bounds=bounds)
+        return weights.x
+    
+    def max_sharpe_ratio(self,rr=0,is_r=True):
+        '''
+        is_r: expected return is True
+        '''
+        n=self.r.shape[0]
+        rets=self.r if is_r else np.repeat(1,n)
+        init=np.repeat(1/n,n)
+        bounds=((0,1),)*n
+        weights_sum={'type':'eq','fun':lambda weights:np.sum(weights)-1}
+
+        def neg_sharpe(weights,rr,r,cov):
+            r_=rk.portfolio_return(weights,r)
+            vol=rk.portfolio_vol(weights,cov)
+            return -(r_-rr)/vol
+        
+        weights=minimize(neg_sharpe,init,args=(rr,rets,self.cov),method='SLSQP',options={'disp':False},constraints=(weights_sum),bounds=bounds)
+        return weights.x
+    
+    def get_rv(self,weights):
+        '''
+        get returns and volatiliy
+        '''
+        ret=rk.portfolio_return(weights,self.r)
+        vol=rk.portfolio_vol(weights,self.cov)
+        return ret,vol
+        
+    def get_cml(self,rr=0):
+        '''
+        get parameters of capital market line
+        '''
+        params=self.max_sharpe_ratio(rr=rr)
+        ret,vol=self.get_rv(params)
+        slope=(ret-rr)/vol
+        intercept=rr
+        return slope,intercept
+    
+    def max_cml(self,sigma=.05,rr=0):
+        '''
+        get max the return of cml
+        '''
+        slope,intercept=self.get_cml(rr)
+        exp_ret=slope*sigma+intercept
+        return exp_ret
+    
+    def get_ef_weights(self,n_points):
+        '''
+        get optimal weights for set of points
+        '''
+        target_rs=np.linspace(self.r.min(),self.r.max(),n_points)
+        weights=[self.min_vol(target_r) for target_r in target_rs]
+        return weights
+    
+    def ew(self):
+        '''
+        get weights for an equally-weighted portf
+        '''
+        n=self.r.shape[0]
+        wt=np.repeat(1/n,n)
+        return wt
+    
+    def gmv(self):
+        '''
+        get weights for global min variance portf
+        '''
+        n=self.r.shape[0]
+        return self.max_sharpe_ratio(0,False)
+    
+    def plot_eff_frontier(self,n_points,style='.-',show_cml=False,rr=0,show_ew=False,show_gmv=False):
+        weights=self.get_ef_weights(n_points)
+        rets=[rk.portfolio_return(w,self.r) for w in weights]
+        vols=[rk.portfolio_vol(w,self.cov) for w in weights]
+        eff_frontier=pd.DataFrame({'Returns':rets,'Volatility':vols})
+        ax=eff_frontier.plot.line(x='Volatility',y='Returns',style=style)
+        ax.set_xlim(left=0)
+
+        if show_cml:
+            wt_msr=self.max_sharpe_ratio(rr)
+            ret_msr,vol_msr=self.get_rv(wt_msr)
+            cml_x=[0,vol_msr]
+            cml_y=[rr,ret_msr]
+            ax.plot(cml_x,cml_y,color='green',marker='o',linestyle='dashed',linewidth=2,markersize=10)
+            ax.legend(['Efficient Frontier','Capital Market Line'])
+        if show_ew:
+            wt_ew=self.ew()
+            ret_ew,vol_ew=self.get_rv(wt_ew)
+            ax.plot(vol_ew,ret_ew,color='goldenrod',marker='o',markersize=10)
+            if show_cml:
+                ax.legend(['Efficient Frontier','Capital Market Line','Equally-weighted Portf'])
+            else:
+                ax.legend(['Efficient Frontier','Equally-weighted Portf'])
+        if show_gmv:
+            wt_gmv=self.gmv()
+            ret_gmv,vol_gmv=self.get_rv(wt_gmv)
+            ax.plot(vol_gmv,ret_gmv,color='midnightblue',marker='o',markersize=10)
+            if show_cml and show_ew:
+                ax.legend(['Efficient Frontier','Capital Market Line','Equally-weighted Portf','Globsl Minimum Variance Portf'])
+            elif show_cml and not show_ew:
+                ax.legend(['Efficient Frontier','Capital Market Line','Globsl Minimum Variance Portf'])
+            elif not show_cml and show_ew:
+                ax.legend(['Efficient Frontier','Equally-weighted Portf','Globsl Minimum Variance Portf'])
+            else:
+                ax.legend(['Efficient Frontier','Globsl Minimum Variance Portf'])
+        
+        return ax

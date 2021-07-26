@@ -45,3 +45,9 @@ def duration(flow):
     weights=flow/total_flow
     result=weights.T @ flow.index
     return result
+
+def portfolio_return(weights,r):
+    return weights.T@r
+
+def portfolio_vol(weights,cov):
+    return (weights.T@cov@weights)**0.5
