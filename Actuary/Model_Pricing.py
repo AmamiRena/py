@@ -695,14 +695,16 @@ class CAPM(object):
     - global min variance portfolio
     -----------------
     r: collections of expected returns
+    r_: realized return
     rr: risk free rate
     cov: covariance matrix
     '''
 
-    def __init__(self,r,cov):
+    def __init__(self,r,r_,cov):
         self.r=r
+        self.r_=r_
         self.cov=cov
-    
+
     @property
     def r(self):
         return self._r
@@ -710,6 +712,13 @@ class CAPM(object):
     def r(self,value):
         self._r=value
     
+    @property
+    def r_(self):
+        return self._r_
+    @r_.setter
+    def r_(self,value):
+        self._r_=value
+
     @property
     def cov(self):
         return self._cov
@@ -728,7 +737,7 @@ class CAPM(object):
         target_return={'type':'eq','args':(self.r,),'fun':lambda weights,r:target_r-rk.portfolio_return(weights,self.r)}
         weights=minimize(rk.portfolio_vol,init,args=(self.cov),method='SLSQP',options={'disp':False},constraints=(weights_sum,target_return),bounds=bounds)
         return weights.x
-    
+
     def max_sharpe_ratio(self,rr=0,is_r=True):
         '''
         is_r: expected return is True
@@ -747,29 +756,33 @@ class CAPM(object):
         weights=minimize(neg_sharpe,init,args=(rr,rets,self.cov),method='SLSQP',options={'disp':False},constraints=(weights_sum),bounds=bounds)
         return weights.x
     
-    def get_rv(self,weights):
+    def get_rv(self,weights,is_realized=False):
         '''
         get returns and volatiliy
         '''
-        ret=rk.portfolio_return(weights,self.r)
-        vol=rk.portfolio_vol(weights,self.cov)
+        if is_realized:
+            ret=rk.portfolio_return(weights,self.r_)
+            vol=rk.portfolio_vol(weights,self.cov)
+        else:
+            ret=rk.portfolio_return(weights,self.r)
+            vol=rk.portfolio_vol(weights,self.cov)
         return ret,vol
         
-    def get_cml(self,rr=0):
+    def get_cml(self,rr=0,is_realized=False):
         '''
         get parameters of capital market line
         '''
         params=self.max_sharpe_ratio(rr=rr)
-        ret,vol=self.get_rv(params)
+        ret,vol=self.get_rv(params,is_realized=is_realized)
         slope=(ret-rr)/vol
         intercept=rr
         return slope,intercept
     
-    def max_cml(self,sigma=.05,rr=0):
+    def max_cml(self,sigma=.05,rr=0,is_realized=False):
         '''
         get max the return of cml
         '''
-        slope,intercept=self.get_cml(rr)
+        slope,intercept=self.get_cml(rr,is_realized=is_realized)
         exp_ret=slope*sigma+intercept
         return exp_ret
     
@@ -833,3 +846,29 @@ class CAPM(object):
                 ax.legend(['Efficient Frontier','Globsl Minimum Variance Portf'])
         
         return ax
+
+# Value@Risk
+class VaR(object):
+    '''
+    eqwt_l: equally weighted loss, temprarily in the form of list of numbers ---> more styles wait to be implemented
+    is_conditional: VaR or CVaR
+    '''
+
+    def __init__(self,eqwt_l):
+        self.eqwt_l=eqwt_l
+    
+    @property
+    def eqwt_l(self):
+        return self._eqwt_l
+    @eqwt_l.setter
+    def eqwt_l(self,value):
+        self._eqwt_l=value
+    
+    def get_VaR(self,probabiliy_level=.9,is_conditional=False):
+        loss=np.sort(self.eqwt_l)
+        VaR=-np.quantile(loss,1-probabiliy_level,interpolation='higher')
+        if not is_conditional:
+            return VaR
+        else:
+            CVaR=-1/(len(loss)*(1-probabiliy_level))*np.sum(loss[loss<=-VaR])
+            return CVaR
