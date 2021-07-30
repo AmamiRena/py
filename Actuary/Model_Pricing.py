@@ -2,6 +2,7 @@ from abc import ABC
 from collections import Iterable
 import numpy as np
 from scipy.optimize import broyden1,minimize
+from scipy.stats import norm
 import pandas as pd
 import simple_cal as rk
 
@@ -695,7 +696,7 @@ class CAPM(object):
     - global min variance portfolio
     -----------------
     r: collections of expected returns
-    r_: realized return
+    r_: realized return, 0 if none
     rr: risk free rate
     cov: covariance matrix
     '''
@@ -872,3 +873,162 @@ class VaR(object):
         else:
             CVaR=-1/(len(loss)*(1-probabiliy_level))*np.sum(loss[loss<=-VaR])
             return CVaR
+
+# black scholes non-binomial
+class BlackScholes(object):
+    '''
+    Ts: number of periods in numpy array
+    t: time to expiration
+    K: strike price
+    path: price paths in numpy array
+    N: notional amount, # of options
+    rr: risk-free-rate
+    c: dividend rate
+    vol: sigma
+    -------------------
+    additional functions will be implemented later
+    '''
+    def __init__(self,Ts,t,K,path,N=1,rr=0,c=0,vol=.3):
+        self.Ts=Ts
+        self.t=t
+        self.K=K
+        self.path=path
+        self.N=N
+        self.rr=rr
+        self.c=c
+        self.vol=vol
+    
+    @property
+    def Ts(self):
+        return self._Ts
+    @Ts.setter
+    def Ts(self,value):
+        self._Ts=value
+
+    @property
+    def t(self):
+        return self._t
+    @t.setter
+    def t(self,value):
+        self._t=value
+    
+    @property
+    def K(self):
+        return self._K
+    @K.setter
+    def K(self,value):
+        self._K=value
+    
+    @property
+    def path(self):
+        return self._path
+    @path.setter
+    def path(self,value):
+        self._path=value
+    
+    @property
+    def N(self):
+        return self._N
+    @N.setter
+    def N(self,value):
+        self._N=value
+    
+    @property
+    def rr(self):
+        return self._rr
+    @rr.setter
+    def rr(self,value):
+        self._rr=value
+    
+    @property
+    def c(self):
+        return self._c
+    @c.setter
+    def c(self,value):
+        self._c=value
+
+    @property
+    def vol(self):
+        return self._vol
+    @vol.setter
+    def vol(self,value):
+        self._vol=value
+    
+    def get_d1(self,S0,dt,is_call=True):
+        dt=dt[:-1]
+        if is_call:
+            return (np.log((S0/self.K))+(self.rr-self.c+self.vol**2/2)*dt)/(self.vol*np.sqrt(dt))
+        
+    def get_d2(self,d1,dt,is_call=True):
+        dt=dt[:-1]
+        if is_call:
+            return d1-self.vol*np.sqrt(dt)
+    
+    def get_delta(self,d1,dt,is_call=True):
+        if is_call:
+            return norm.cdf(d1)
+        else:
+            return norm.cdf(d1)-np.exp(-self.c*dt)        
+    
+    def price(self,S0,d1,d2,dt):
+        return S0*norm.cdf(d1)*(np.exp(-self.c*dt))-self.K*norm.cdf(d2)*(np.exp(-self.rr*dt))
+    
+    def get_annual_vol(self):
+        log_ret=np.array([np.log(i/j) for i,j in zip(self.path[1:],self.path)])
+        return np.std(log_ret,ddof=1)*np.sqrt(4*(len(self.Ts)-1))
+    
+    def get_PL_hedge(self):
+        dt=self.t*(1-self.Ts/(len(self.Ts)-1))
+        d1=self.get_d1(self.path[:-1],dt)
+        d2=self.get_d2(d1,dt)
+        delta=self.get_delta(d1,dt)
+        stocks_held=self.N*delta
+        portfolio=np.zeros(len(self.Ts))
+        portfolio[0]=self.price(self.path[0],d1[0],d2[0],dt[0])*self.N
+        cash_account=np.zeros(len(self.Ts))
+        cash_account[0]=portfolio[0]-(stocks_held[0]*self.path[0])
+        for T in self.Ts[1:]:
+            portfolio[T]=stocks_held[T-1]*self.path[T]+cash_account[T-1]*(1+self.rr/200)
+            if T!=50:
+                cash_account[T]=portfolio[T]-stocks_held[T]*self.path[T]
+        hedge=portfolio[len(self.Ts)-1]-self.N*max(0,self.path[-1]-self.K)
+        return hedge
+    
+# Credit Default Obligation
+class CDO(object):
+    '''
+    default_prob: default probability for credit #
+    '''
+    def __init__(self,default_probs):
+        self.default_probs=default_probs
+    
+    @property
+    def default_probs(self):
+        return self._default_probs
+    @default_probs.setter
+    def default_probs(self,value):
+        self._default_probs=value
+    
+    def get_P(self):
+        l=len(self.default_probs)
+        p=np.zeros((l+1))
+        p[0]=1-self.default_probs[0]
+        p[1]=self.default_probs[1]
+        for i in range(2,l+1):
+            for j in range(i,0,-1):
+                p[j]=p[j-1]*self.default_probs[i-1]+p[j]*(1-self.default_probs[i-1])
+            p[0]=p[0]*(1-self.default_probs[i-1])
+        return p
+    
+    def get_pn(self,n):
+        return self.get_P()[n]
+
+    def exp_loss(self):
+        return np.sum(self.default_probs)
+    
+    def exp_loss_var(self):
+        return np.sum([self.get_P()[i]*(i-self.exp_loss())**2 for i in range(len(self.get_P()))])
+
+    def exp_tranche_loss(self,lower,upper):
+        if upper-lower>=2:
+            return np.sum([self.get_P()[i]*min(upper-lower,i-lower) for i in range(lower+1,len(self.default_probs)+1)]) if upper<len(self.default_probs) else np.sum([self.get_P()[i]*min(upper-lower,i-lower) for i in range(lower+1,len(self.default_probs))])
