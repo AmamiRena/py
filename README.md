@@ -32,3 +32,6 @@ Python_Visualis: python visualisation matplotlib, seaborn, pyecharts<br/>
 
 ## Actuary<br/>
 Actuarial related: Basically from Actex MFE<br/>
+
+## TM DS Fes<br/>
+Talent Master Data Visualisation Fes<br/>
